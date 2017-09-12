@@ -24,6 +24,9 @@ router.post("/upload", (req, res) => {
   // 设置单个文件大小限制
   form.maxFieldsSize = 5 * 1024 * 1024;
 
+  // 允许多个文件上传
+  form.multiples = true;
+
   // 解析请求 存储图片
   form.parse(req, (err, fields, files) => {
     //错误处理
@@ -43,23 +46,41 @@ router.post("/upload", (req, res) => {
       });
       return;
     }
+    // 单张和多张图片上传 约定参数为file
+    // 多张
+    if (Array.isArray(files.file)) {
+      files.file.forEach(function(file) {
+        changeFileName(file);
+      }, this);
 
-    //   修改文件名
-    var oldPath = files.file.path;
-    var newPath = path.join(form.uploadDir, files.file.name);
-    fs.rename(oldPath, newPath, err => {
-      if (err) {
-        console.log(err.message);
-        return;
-      }
-      // 修改名称成功
+      res.json({
+        code:1,
+        message:`${files.file.length} 个文件上传成功`
     });
 
-    res.json({
-      code: 1,
-      message:`${files.file.name} 上传成功`
+    } else {
+      // 单张
+      changeFileName(files.file);
+
+      res.json({
+        code:1,
+        message:`${files.file.name} 上传成功`
     });
+
+    }
+
   });
 });
+
+// cb为回调函数，修改错误时，返回修改错误的文件名
+changeFileName = (file, cb) => {
+  var oldPath = file.path;
+  var newPath = path.join(path.dirname(oldPath), file.name);
+  fs.rename(oldPath, newPath, (err) => {
+    if (err) {
+      console.log(err.message);
+    } 
+  });
+};
 
 module.exports = router;
