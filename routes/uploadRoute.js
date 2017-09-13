@@ -46,6 +46,12 @@ router.post("/upload", (req, res) => {
       });
       return;
     }
+
+    //打印下传进来的其他参数 写入数据库
+    console.log(fields);
+
+
+
     // 单张和多张图片上传 约定参数为file
     // 多张
     if (Array.isArray(files.file)) {
