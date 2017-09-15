@@ -5,6 +5,13 @@ var app = express();
 // 使用8080端口
 var port = process.env.PORT || 8080;
 
+var bodyParser = require('body-parser')
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
+
 // 引入路由
 var uploadRoute = require('./routes/uploadRoute');
 // 使用路由 当访问'http.../api/upload时会走上面定义的处理函数

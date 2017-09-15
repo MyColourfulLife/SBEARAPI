@@ -8,11 +8,52 @@ var formidable = require("formidable");
 var path = require("path");
 // 使用fs来处理文件
 var fs = require("fs");
+var bodyParser = require('body-parser')
+
+
+var mongoose = require("mongoose");
+var Mark = require("../models/ImageMark.model");
+mongoose.Promise = require('bluebird');
+
+// 数据库名
+var db_url = "mongodb://127.0.0.1:27017/sbear";
+
+// 链接mongodb
+mongoose.connect(db_url);
+
+mongoose.connection.on("connected", () => {
+  console.log("Mongoose connection  open to sbear");
+});
+
+mongoose.connection.on("error", err => {
+  console.log(`Mongoose connection error ${err}`);
+});
+
+mongoose.connection.once("open", () => {
+  console.log("数据库启动了");
+});
+
+
+router.get('/marks',(req,res)=>{
+  Mark.find({}).exec().then(marks=>{
+    console.log(marks);
+    res.json({
+      code:1,
+      marks: marks
+    });
+  }).catch(err=>{
+    res.json({
+      code : 0,
+      message: err.message
+    });
+  });
+ 
+});
 
 // 提供一个接口
 router.post("/upload", (req, res) => {
   console.log("收到文件上传请求");
-
+  console.log(req.body);
   // 使用formidable 处理收到的文件请求
   var form = new formidable.IncomingForm();
   // 配置参数
@@ -29,6 +70,7 @@ router.post("/upload", (req, res) => {
 
   // 解析请求 存储图片
   form.parse(req, (err, fields, files) => {
+
     //错误处理
     if (err) {
       res.json({
@@ -46,12 +88,6 @@ router.post("/upload", (req, res) => {
       });
       return;
     }
-
-    //打印下传进来的其他参数 写入数据库
-    console.log(fields);
-
-
-
     // 单张和多张图片上传 约定参数为file
     // 多张
     if (Array.isArray(files.file)) {
@@ -74,8 +110,27 @@ router.post("/upload", (req, res) => {
     });
 
     }
-
   });
+
+  // 使用上面解析过的时候 写入数据库不成功
+  // var newMark = Mark();
+      // console.log('body:',req.body);
+  
+      // newMark.fileName = fields.deviceType;
+      // newMark.deviceType = fields.deviceType ? fields.deviceType : null;
+      // newMark.deviceName = fields.deviceName ? fields.deviceName : null;
+      // newMark.fileSize = fields.fileSize ? fields.fileSize : null;
+      // newMark.fileName = fields.createDate ? fields.createDate : null;
+      // newMark.markFrame = fields.markFrame ? fields.markFrame : null;
+      // newMark.remoteUrl = fields.remoteUrl ? fields.remoteUrl : null;
+  
+    //   newMark.save().then(mark=>{
+    //     console.log(mark);
+    // }).catch(err=>{
+    //     console.log(err);
+    // });
+
+
 });
 
 // cb为回调函数，修改错误时，返回修改错误的文件名
