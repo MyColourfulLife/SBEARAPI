@@ -23,7 +23,7 @@ var MarkSchema = new Schema({
     fileSize:{
         type:Array
     },
-    createDate:{
+    createTime:{
         type:String,
     },
     markFrame:{

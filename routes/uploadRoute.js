@@ -53,7 +53,6 @@ router.get('/marks',(req,res)=>{
 // 提供一个接口
 router.post("/upload", (req, res) => {
   console.log("收到文件上传请求");
-  console.log(req.body);
   // 使用formidable 处理收到的文件请求
   var form = new formidable.IncomingForm();
   // 配置参数
@@ -88,11 +87,14 @@ router.post("/upload", (req, res) => {
       });
       return;
     }
+
     // 单张和多张图片上传 约定参数为file
     // 多张
     if (Array.isArray(files.file)) {
       files.file.forEach(function(file) {
         changeFileName(file);
+        
+        saveFields(fields);
       }, this);
 
       res.json({
@@ -103,7 +105,7 @@ router.post("/upload", (req, res) => {
     } else {
       // 单张
       changeFileName(files.file);
-
+      saveFields(fields);
       res.json({
         code:1,
         message:`${files.file.name} 上传成功`
@@ -112,23 +114,6 @@ router.post("/upload", (req, res) => {
     }
   });
 
-  // 使用上面解析过的时候 写入数据库不成功
-  // var newMark = Mark();
-      // console.log('body:',req.body);
-  
-      // newMark.fileName = fields.deviceType;
-      // newMark.deviceType = fields.deviceType ? fields.deviceType : null;
-      // newMark.deviceName = fields.deviceName ? fields.deviceName : null;
-      // newMark.fileSize = fields.fileSize ? fields.fileSize : null;
-      // newMark.fileName = fields.createDate ? fields.createDate : null;
-      // newMark.markFrame = fields.markFrame ? fields.markFrame : null;
-      // newMark.remoteUrl = fields.remoteUrl ? fields.remoteUrl : null;
-  
-    //   newMark.save().then(mark=>{
-    //     console.log(mark);
-    // }).catch(err=>{
-    //     console.log(err);
-    // });
 
 
 });
@@ -143,5 +128,29 @@ changeFileName = (file, cb) => {
     } 
   });
 };
+
+// 存入数据库
+saveFields = (fields)=>{
+  if (!fields) {
+    console.log('nothing to save');
+    return;
+  }
+
+  var newMark = Mark();
+  newMark.fileName = fields.fileName;
+  newMark.deviceType = fields.deviceType;
+  newMark.deviceName = fields.deviceName;
+  newMark.fileSize = fields.fileSize;
+  newMark.createTime = fields.createTime;
+  newMark.markFrame = fields.markFrame;
+  newMark.remoteUrl = fields.remoteUrl;
+
+  newMark.save(function (err,res) {
+    console.log('err:',err);
+  });
+
+}
+
+
 
 module.exports = router;
