@@ -33,13 +33,14 @@ mongoose.connection.once("open", () => {
   console.log("数据库启动了");
 });
 
-
-router.get('/marks',(req,res)=>{
-  Mark.find({}).exec().then(marks=>{
-    console.log(marks);
+/**
+ * 获取所有的文件信息
+ */
+router.get('/files',(req,res)=>{
+  Mark.find({}).exec().then(files=>{
     res.json({
       code:1,
-      marks: marks
+      data: files
     });
   }).catch(err=>{
     res.json({
@@ -50,7 +51,64 @@ router.get('/marks',(req,res)=>{
  
 });
 
-// 提供一个接口
+/**
+ * 根据文件名称获取文件信息
+ */
+router.get('/fileInfo/:fileName',(req,res)=>{
+Mark.find({
+  fileName:req.params.fileName
+}).exec((err,file)=>{
+  if (err) {
+    res.json({
+      code:0,
+      message:err.message
+    });
+    return;
+  } 
+
+  res.json({
+    code:1,
+    data:file
+  });
+
+});
+});
+
+/**
+ * 获取uuid字段下的所有文件
+ */
+router.get('/filesByUUID/:uuid',(req,res)=>{
+
+Mark.find({
+  deviceUUID:req.params.uuid
+}).exec((err,files)=>{
+
+  if (err) {
+    res.json({
+      code:0,
+      message:err.message
+    });
+    return;
+  } 
+
+  res.json({
+    code:1,
+    data:files
+  });
+
+
+});
+
+
+});
+
+
+
+
+
+
+
+// 上传文件的接口
 router.post("/upload", (req, res) => {
   console.log("收到文件上传请求");
   // 使用formidable 处理收到的文件请求
@@ -99,7 +157,7 @@ router.post("/upload", (req, res) => {
 
       res.json({
         code:1,
-        message:`${files.file.length} 个文件上传成功`
+        data:`${files.file.length} 个文件上传成功`
     });
 
     } else {
@@ -108,13 +166,11 @@ router.post("/upload", (req, res) => {
       saveFields(fields);
       res.json({
         code:1,
-        message:`${files.file.name} 上传成功`
+        data:`${files.file.name} 上传成功`
     });
 
     }
   });
-
-
 
 });
 
@@ -144,10 +200,35 @@ saveFields = (fields)=>{
   newMark.createTime = fields.createTime;
   newMark.markFrame = fields.markFrame;
   newMark.remoteUrl = fields.remoteUrl;
+  newMark.deviceUUID  = fields.uuid;
 
   newMark.save(function (err,res) {
-    console.log('err:',err);
+    if (err){
+      console.log('保存失败,尝试更新',err.message);
+      Mark.findOneAndUpdate({fileName:fields.fileName},{
+        $set:{
+          fileName : fields.fileName,
+          deviceType : fields.deviceType,
+          deviceName : fields.deviceName,
+          fileSize : fields.fileSize,
+          createTime : fields.createTime,
+          markFrame : fields.markFrame,
+          remoteUrl : fields.remoteUrl,
+          deviceUUID  : fields.uuid
+        }
+      },(err,res)=>{
+        if (res) {
+          console.log('更新成功',res);
+        }
+        if (err) {
+          console.log('更新失败',err);
+        }
+      });
+    }
   });
+
+
+
 
 }
 
