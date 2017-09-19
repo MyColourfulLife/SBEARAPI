@@ -10,6 +10,9 @@ var path = require("path");
 var fs = require("fs");
 var bodyParser = require('body-parser')
 
+// 引入上传图片的方法
+var upTecent = require('../public/upTecent');
+var baseTecentPath = "http://labeluploads-1254220375.cosgz.myqcloud.com/";
 
 var mongoose = require("mongoose");
 var Mark = require("../models/ImageMark.model");
@@ -110,7 +113,6 @@ Mark.find({
 
 // 上传文件的接口
 router.post("/upload", (req, res) => {
-  console.log("收到文件上传请求");
   // 使用formidable 处理收到的文件请求
   var form = new formidable.IncomingForm();
   // 配置参数
@@ -181,7 +183,9 @@ changeFileName = (file, cb) => {
   fs.rename(oldPath, newPath, (err) => {
     if (err) {
       console.log(err.message);
-    } 
+    } else {
+      upTecent(file.name,newPath);
+    }
   });
 };
 
@@ -201,6 +205,7 @@ saveFields = (fields)=>{
   newMark.markFrame = fields.markFrame;
   newMark.remoteUrl = fields.remoteUrl;
   newMark.deviceUUID  = fields.uuid;
+  newMark.remoteUrl = baseTecentPath + fields.fileName;
 
   newMark.save(function (err,res) {
     if (err){
@@ -231,7 +236,6 @@ saveFields = (fields)=>{
 
 
 }
-
 
 
 module.exports = router;
