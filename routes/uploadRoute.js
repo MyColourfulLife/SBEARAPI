@@ -10,6 +10,7 @@ var path = require("path");
 var fs = require("fs");
 var bodyParser = require('body-parser')
 
+
 // 引入上传图片的方法
 var upTecent = require('../public/upTecent');
 var baseTecentPath = "http://labeluploads-1254220375.cosgz.myqcloud.com/";
@@ -19,13 +20,21 @@ var Mark = require("../models/ImageMark.model");
 mongoose.Promise = require('bluebird');
 
 // 数据库名
-var db_url = "mongodb://127.0.0.1:27017/sbear";
 
+var testENV = false;//测试环境默认为真，如果是false则为生产环境
+
+var host = testENV ? "192.168.1.180": "120.76.102.238";
+var port = 27017;
+var username = "idbear_mongodb";
+var password = testENV ? "idbear_2015_mongodb_test" : "Ca!!6Xei#5zidae$6aer%ai7u_Yo@4ee";
+var database = "idbear";
+
+var db_url = `mongodb://${host}:${port}/${database}`;
 // 链接mongodb
-mongoose.connect(db_url);
+mongoose.connect(db_url,{user:username,pass:password,useMongoClient:true})
 
 mongoose.connection.on("connected", () => {
-  console.log("Mongoose connection  open to sbear");
+  console.log(`Mongoose connection  open to ${database}`);
 });
 
 mongoose.connection.on("error", err => {

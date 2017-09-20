@@ -36,7 +36,7 @@ function putObject(filename,filepath) {
                 TaskId = tid;
             },
             onProgress: function (progressData) {
-                console.log(JSON.stringify(progressData));
+                // console.log(JSON.stringify(progressData));
             },
             // 格式1. 传入文件内容
             // Body: fs.readFileSync(filepath),
