@@ -17,11 +17,7 @@ var baseTecentPath = "http://labeluploads-1254220375.cosgz.myqcloud.com/";
 
 var mongoose = require("mongoose");
 var Mark = require("../models/ImageMark.model");
-Mark.ensureIndexes({"fileName":1},(err)=>{
-  if (err) {
-    console.log('索引创建失败',err.message);
-  }
-})
+
 mongoose.Promise = require('bluebird');
 
 // 数据库名

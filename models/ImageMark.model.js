@@ -13,9 +13,6 @@ var Schema = mongoose.Schema
 var MarkSchema = new Schema({
     fileName: {
         type:String,
-        index:true,
-        unique:true,
-
     },
     deviceType: {
         type:String,
@@ -50,6 +47,6 @@ var MarkSchema = new Schema({
         default:Date.now
     }
   });
-
+MarkSchema.index({fileName:1})
   // mongoose.model 表示实例化Schema
 module.exports = mongoose.model('Mark', MarkSchema);
