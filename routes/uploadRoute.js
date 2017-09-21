@@ -225,7 +225,7 @@ saveFields = (fields)=>{
       markFrame : fields.markFrame,
       remoteUrl : baseTecentPath + fields.fileName,
       deviceUUID  : fields.uuid,
-      date:Date.now
+      date:Date.now()
     }
   },{upsert:true},(err,res)=>{
     if (err) {
