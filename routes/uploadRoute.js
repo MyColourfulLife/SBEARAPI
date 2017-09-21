@@ -218,7 +218,7 @@ saveFields = (fields)=>{
       fileSize : fields.fileSize,
       createTime : fields.createTime,
       markFrame : fields.markFrame,
-      remoteUrl : baseTecentPath + fields.remoteUrl,
+      remoteUrl : baseTecentPath + fields.fileName,
       deviceUUID  : fields.uuid
     }
   },{upsert:true,overwrite:false},(err,res)=>{
@@ -226,7 +226,7 @@ saveFields = (fields)=>{
       console.log(err.message);
     }
     if (res) {
-      console.log(res);
+      // console.log(res);
     }
 
   })
