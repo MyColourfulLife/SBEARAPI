@@ -13,28 +13,37 @@ var Schema = mongoose.Schema
 var MarkSchema = new Schema({
     fileName: {
         type:String,
-        index:true
+        index:true,
+        unique:true,
+
     },
     deviceType: {
         type:String,
+
     },
     deviceName:{
         type:String,
+
     },
     fileSize:{
-        type:String
+        type:String,
+
     },
     createTime:{
         type:String,
+
     },
     markFrame:{
-        type:String
+        type:String,
+
     },
     remoteUrl:{
-        type:String
+        type:String,
+
     },
     deviceUUID:{
-        type:String
+        type:String,
+
     },
     date:{
         type:Date,

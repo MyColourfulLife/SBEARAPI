@@ -22,16 +22,21 @@ mongoose.Promise = require('bluebird');
 // 数据库名
 
 var testENV = false;//测试环境默认为真，如果是false则为生产环境
+var loacalTest = "127.0.0.1";
+var remoteTest = "192.168.1.180";
 
-var host = testENV ? "192.168.1.180": "120.76.102.238";
+var host = testENV ? remoteTest: "120.76.102.238";
 var port = 27017;
 var username = "idbear_mongodb";
 var password = testENV ? "idbear_2015_mongodb_test" : "Ca!!6Xei#5zidae$6aer%ai7u_Yo@4ee";
 var database = "idbear";
 
 var db_url = `mongodb://${host}:${port}/${database}`;
-// 链接mongodb
+// 链接mongodb 非本地测试用 使用本地测试时 注释下面代码
 mongoose.connect(db_url,{user:username,pass:password,useMongoClient:true})
+
+// 链接mongodb 本地测试 生产环境注释下面代码
+// mongoose.connect(db_url);
 
 mongoose.connection.on("connected", () => {
   console.log(`Mongoose connection  open to ${database}`);
@@ -205,45 +210,26 @@ saveFields = (fields)=>{
     return;
   }
 
-  var newMark = Mark();
-  newMark.fileName = fields.fileName;
-  newMark.deviceType = fields.deviceType;
-  newMark.deviceName = fields.deviceName;
-  newMark.fileSize = fields.fileSize;
-  newMark.createTime = fields.createTime;
-  newMark.markFrame = fields.markFrame;
-  newMark.remoteUrl = fields.remoteUrl;
-  newMark.deviceUUID  = fields.uuid;
-  newMark.remoteUrl = baseTecentPath + fields.fileName;
-
-  newMark.save(function (err,res) {
-    if (err){
-      console.log('保存失败,尝试更新',err.message);
-      Mark.findOneAndUpdate({fileName:fields.fileName},{
-        $set:{
-          fileName : fields.fileName,
-          deviceType : fields.deviceType,
-          deviceName : fields.deviceName,
-          fileSize : fields.fileSize,
-          createTime : fields.createTime,
-          markFrame : fields.markFrame,
-          remoteUrl : fields.remoteUrl,
-          deviceUUID  : fields.uuid
-        }
-      },(err,res)=>{
-        if (res) {
-          console.log('更新成功',res);
-        }
-        if (err) {
-          console.log('更新失败',err);
-        }
-      });
+  Mark.update({fileName:fields.fileName},{
+    $set:{
+      fileName : fields.fileName,
+      deviceType : fields.deviceType,
+      deviceName : fields.deviceName,
+      fileSize : fields.fileSize,
+      createTime : fields.createTime,
+      markFrame : fields.markFrame,
+      remoteUrl : baseTecentPath + fields.remoteUrl,
+      deviceUUID  : fields.uuid
     }
-  });
+  },{upsert:true,overwrite:false},(err,res)=>{
+    if (err) {
+      console.log(err.message);
+    }
+    if (res) {
+      console.log(res);
+    }
 
-
-
-
+  })
 }
 
 
