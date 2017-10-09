@@ -3,7 +3,7 @@ var express = require("express");
 var app = express();
 
 // 使用8080端口
-var port = process.env.PORT || 8080;
+var port = process.env.PORT || 7070;
 
 var bodyParser = require('body-parser')
 // parse application/x-www-form-urlencoded

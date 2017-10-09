@@ -47,6 +47,7 @@ var MarkSchema = new Schema({
         default:Date.now
     }
   });
-MarkSchema.index({fileName:1})
+MarkSchema.index({fileName:1});
+
   // mongoose.model 表示实例化Schema
 module.exports = mongoose.model('Mark', MarkSchema);
